@@ -27,7 +27,7 @@ public class Main {
         System.out.println("Regular hours: " + employee.getRegularHours());
         System.out.println("Overtime hours: " + employee.getOvertimeHours());
 
-       
+
         employee.punchTimeCard(9.0);
         employee.punchTimeCard(18.0);
         System.out.println("Hours worked: " + employee.getHoursWorked());
