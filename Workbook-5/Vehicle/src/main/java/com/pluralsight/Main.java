@@ -13,7 +13,7 @@ public class Main {
         hoverCraft.hover();
         car.openTrunk();
 
-     
+
         System.out.println("Color of the Moped: " + slowRide.getColor());
         System.out.println("Fuel capacity of the SemiTruck: " + semiTruck.getFuelCapacity());
         System.out.println("Air cushion pressure of the HoverCraft: " + hoverCraft.getAirCushionPressure());
