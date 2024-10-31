@@ -1,4 +1,4 @@
-package com.pluralsight.finance;
+package com.pluralsight;
 
 public interface Valuable {
     double getValue();

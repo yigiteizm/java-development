@@ -1,6 +1,9 @@
-package com.pluralsight.finance;
+package com.pluralsight;
 
-public class FixedAsset {
+public abstract class FixedAsset implements Valuable {
+ String name;
+ double value;
 
-    
+
+
 }
