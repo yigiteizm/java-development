@@ -1,11 +1,11 @@
--- Qusetion 1:Most expensive product name
+-- Question 1:Most expensive product name
 
 SELECT ProductName
 FROM products
 WHERE UnitPrice = (SELECT MAX(UnitPrice)
 FROM products);
 
--- Qusetion 2:Order ID,shipping name, and shipping adress of orders.alter
+-- Question 2:Order ID,shipping name, and shipping adress of orders.alter
 
 
 
@@ -20,7 +20,7 @@ WHERE CompanyName = 'Federal Shipping'
 
 
 
--- 3. Order IDs of orders that ordered "Sasquatch Ale"
+-- Question 3. Order IDs of orders that ordered "Sasquatch Ale"
 SELECT OrderID
 FROM `Order Details`
 WHERE ProductID = (
@@ -29,7 +29,7 @@ WHERE ProductID = (
   WHERE ProductName = 'Sasquatch Ale'
 );
 
--- 4. Name of the employee that sold order 10266
+-- Question 4. Name of the employee that sold order 10266
 SELECT FirstName, LastName
 FROM Employees
 WHERE EmployeeID = (
@@ -38,7 +38,7 @@ WHERE EmployeeID = (
   WHERE OrderID = 10266
 );
 
--- 5. Name of the customer that bought order 10266
+-- Question 5. Name of the customer that bought order 10266
 SELECT CompanyName
 FROM Customers
 WHERE CustomerID = (
