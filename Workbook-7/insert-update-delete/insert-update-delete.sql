@@ -1,46 +1,33 @@
--- Question 1: Most expensive product name
-SELECT ProductName
+---- Question 1: Add a new supplier
+-- Question 1: Add a new supplier
+INSERT INTO Suppliers (SupplierID, CompanyName, ContactName, ContactTitle, Address, City, Region, PostalCode, Country, Phone)
+VALUES (30, 'New Supplier', 'John Doe', 'CEO', '123 Elm St', 'Sample City', 'Region A', '12345', 'Country X', '123-456-7890');
+;
+
+-- Question 2: Add a new product provided by that supplier
+INSERT INTO Products (ProductName, SupplierID, CategoryID, QuantityPerUnit, UnitPrice, UnitsInStock, UnitsOnOrder, ReorderLevel, Discontinued)
+VALUES (78,'New Product',30,1,10.00);
+
+-- Question 3: List all products and their suppliers
+SELECT Products.ProductName, Suppliers.CompanyName
 FROM Products
-WHERE UnitPrice = (SELECT MAX(UnitPrice) FROM Products);
--- Question 2: Cheapest product name
-SELECT ProductName
+LEFT JOIN Suppliers ON Products.SupplierID = Suppliers.SupplierID;
+-- Question 4: Raise the price of your new product by 15%
+UPDATE Products
+SET UnitPrice = UnitPrice * 1.15
+WHERE ProductID = '78';
+
+--- Question 5: List the products and prices of all products from that supplier
+SELECT ProductName,UnitPrice
 FROM Products
-WHERE UnitPrice = (SELECT MIN(UnitPrice) FROM Products);
--- Question 3: Number of products in each category
-SELECT Categories.CategoryName, COUNT(Products.ProductID) AS ProductCount
-FROM Products
-JOIN Categories ON Products.CategoryID = Categories.CategoryID
-GROUP BY Categories.CategoryName;
--- Question 4: Supplier providing the most products
-SELECT Suppliers.CompanyName, COUNT(Products.ProductID) AS ProductCount
-FROM Products
-JOIN Suppliers ON Products.SupplierID = Suppliers.SupplierID
-GROUP BY Suppliers.CompanyName
-ORDER BY ProductCount DESC
-LIMIT 1;
--- Question 5: Products with no orders
-SELECT ProductName
-FROM Products
-WHERE ProductID NOT IN (SELECT ProductID FROM OrderDetails);
--- Question 6: Total revenue for each product
-SELECT Products.ProductName, SUM(OrderDetails.Quantity * OrderDetails.UnitPrice) AS TotalRevenue
-FROM OrderDetails
-JOIN Products ON OrderDetails.ProductID = Products.ProductID
-GROUP BY Products.ProductName
-ORDER BY TotalRevenue DESC;
--- Question 7: Employee who handled the most orders
-SELECT Employees.FirstName, Employees.LastName, COUNT(Orders.OrderID) AS OrderCount
-FROM Orders
-JOIN Employees ON Orders.EmployeeID = Employees.EmployeeID
-GROUP BY Employees.EmployeeID
-ORDER BY OrderCount DESC
--- Question 8: Average price of products in each category
-
-
-
--- Question 9: Customers who placed the largest number of orders
-
-
-
--- Question 10: Products with stock below reorder level
-
+WHERE SupplierID = 30;
+-- Question 6: Delete the new product
+DELETE FROM Products
+WHERE ProductID = 30;
+-- Question 7: Delete the new supplier
+DELETE FROM Suppliers
+WHERE CompanyName = 'New Supplier Co';
+-- Question 8: List all products
+SELECT * FROM Products;
+-- Question 9: List all suppliers
+SELECT * FROM Suppliers;
