@@ -2,11 +2,14 @@ package com.pluralsight;
 
 import java.sql.*;
 import java.util.Scanner;
+import org.apache.commons.dbcp2.BasicDataSource;
 
 public class Main {
     public static void main(String[] args) {
+        // Check for command line arguments for username and password
         if (args.length != 2) {
-            System.out.println("Application needs two arguments to run: java com.pluralsight.Main <username> <password>");
+            System.out.println("Application needs two arguments to run: " +
+                    "java com.pluralsight.Main <username> <password>");
             System.exit(1);
         }
 
@@ -45,100 +48,71 @@ public class Main {
         }
     }
 
-    private static void displayAllProducts(String username, String password) {
-        try (
-                Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/northwind", username, password);
-                PreparedStatement statement = connection.prepareStatement("SELECT ProductID, ProductName, UnitPrice, UnitsInStock FROM products");
-                ResultSet results = statement.executeQuery()
-        ) {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-
-            while (results.next()) {
-                int productId = results.getInt("ProductID");
-                String productName = results.getString("ProductName");
-                double unitPrice = results.getDouble("UnitPrice");
-                int unitsInStock = results.getInt("UnitsInStock");
-
-                System.out.println("Product ID: " + productId);
-                System.out.println("Product Name: " + productName);
-                System.out.println("Unit Price: " + unitPrice);
-                System.out.println("Units In Stock: " + unitsInStock);
-                System.out.println("-----------------------------------------");
-            }
-
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void displayAllCustomers(String username, String password) {
-        try (
-                Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/northwind", username, password);
-                PreparedStatement statement = connection.prepareStatement("SELECT ContactName, CompanyName, City, Country, Phone FROM Customers ORDER BY Country");
-                ResultSet results = statement.executeQuery()
-        ) {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-
-            while (results.next()) {
-                String contactName = results.getString("ContactName");
-                String companyName = results.getString("CompanyName");
-                String city = results.getString("City");
-                String country = results.getString("Country");
-                String phone = results.getString("Phone");
-
-                System.out.println("Contact Name: " + contactName);
-                System.out.println("Company Name: " + companyName);
-                System.out.println("City: " + city);
-                System.out.println("Country: " + country);
-                System.out.println("Phone: " + phone);
-                System.out.println("-----------------------------------------");
-            }
-
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
     private static void displayAllCategories(String username, String password) {
-        Scanner scanner = new Scanner(System.in);
-
-        try (
-                Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/northwind", username, password);
-                PreparedStatement statement = connection.prepareStatement("SELECT CategoryID, CategoryName FROM Categories ORDER BY CategoryID");
-                ResultSet results = statement.executeQuery()
-        ) {
+        try {
             Class.forName("com.mysql.cj.jdbc.Driver");
+            try (Connection connection = DriverManager.getConnection(
+                    "jdbc:mysql://localhost:3306/northwind",
+                    username,
+                    password);
+                 PreparedStatement statement = connection.prepareStatement(
+                         "SELECT CategoryID, CategoryName FROM Categories ORDER BY CategoryID");
+                 ResultSet resultSet = statement.executeQuery()) {
 
-            System.out.println("Categories:");
-            while (results.next()) {
-                int categoryId = results.getInt("CategoryID");
-                String categoryName = results.getString("CategoryName");
+                System.out.println("Categories:");
+                while (resultSet.next()) {
+                    int categoryId = resultSet.getInt("CategoryID");
+                    String categoryName = resultSet.getString("CategoryName");
+                    System.out.println(categoryId + ": " + categoryName);
+                }
 
-                System.out.println("Category ID: " + categoryId + ", Category Name: " + categoryName);
+                Scanner scanner = new Scanner(System.in);
+                System.out.print("Enter the category ID: ");
+                int categoryId = scanner.nextInt();
+
+                displayProductsInCategory(connection, categoryId);
+
             }
-
-            System.out.print("Enter a category ID to see its products: ");
-            int selectedCategoryId = scanner.nextInt();
-
-            displayProductsByCategory(selectedCategoryId, username, password);
-
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
     }
 
-    private static void displayProductsByCategory(int categoryId, String username, String password) {
-        try (
-                Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/northwind", username, password);
-                PreparedStatement statement = connection.prepareStatement(
-                        "SELECT ProductID, ProductName, UnitPrice, UnitsInStock " +
-                                "FROM Products WHERE CategoryID = ?"
-                )
-        ) {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            statement.setInt(1, categoryId);
+    private static void displayProductsInCategory(Connection connection, int categoryId) {
+        String query = "SELECT ProductID, ProductName, UnitPrice, UnitsInStock FROM Products WHERE CategoryID = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, categoryId);
+            try (ResultSet productResultSet = preparedStatement.executeQuery()) {
+                System.out.println("\nProducts in the selected category:");
+                while (productResultSet.next()) {
+                    int productId = productResultSet.getInt("ProductID");
+                    String productName = productResultSet.getString("ProductName");
+                    double unitPrice = productResultSet.getDouble("UnitPrice");
+                    int unitsInStock = productResultSet.getInt("UnitsInStock");
 
-            try (ResultSet results = statement.executeQuery()) {
+                    System.out.println("Product ID: " + productId);
+                    System.out.println("Product Name: " + productName);
+                    System.out.println("Unit Price: " + unitPrice);
+                    System.out.println("Units In Stock: " + unitsInStock);
+                    System.out.println("-----------------------------------------");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void displayAllProducts(String username, String password) {
+        String query = "SELECT ProductID, ProductName, UnitPrice, UnitsInStock FROM products";
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            // Use try-with-resources for automatic resource management
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/northwind", username, password);
+                 PreparedStatement statement = connection.prepareStatement(query);
+                 ResultSet results = statement.executeQuery()) {
+
                 while (results.next()) {
                     int productId = results.getInt("ProductID");
                     String productName = results.getString("ProductName");
@@ -152,9 +126,41 @@ public class Main {
                     System.out.println("-----------------------------------------");
                 }
             }
-
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
     }
+
+
+    private static void displayAllCustomers(String username, String password) {
+        String query = "SELECT ContactName, CompanyName, City, Country, Phone FROM Customers ORDER BY Country";
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            // Use try-with-resources for automatic resource management
+            try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/northwind", username, password);
+                 PreparedStatement statement = connection.prepareStatement(query);
+                 ResultSet results = statement.executeQuery()) {
+
+                while (results.next()) {
+                    String contactName = results.getString("ContactName");
+                    String companyName = results.getString("CompanyName");
+                    String city = results.getString("City");
+                    String country = results.getString("Country");
+                    String phone = results.getString("Phone");
+
+                    System.out.println("Contact Name: " + contactName);
+                    System.out.println("Company Name: " + companyName);
+                    System.out.println("City: " + city);
+                    System.out.println("Country: " + country);
+                    System.out.println("Phone: " + phone);
+                    System.out.println("-----------------------------------------");
+                }
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
