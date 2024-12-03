@@ -1,76 +1,65 @@
-package com.pluralsight;
+package Main;
 
+import db.DataManager;
+import models.Actor;
+import models.Film;
 import org.apache.commons.dbcp2.BasicDataSource;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        // Create a BasicDataSource
+        // Get the username and password
+        String username = args[0];
+        String password = args[1];
+
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setUrl("jdbc:mysql://localhost:3306/sakila");
-        dataSource.setUsername("root");
-        dataSource.setPassword("P@ssw0rd");
 
-        // Use try-with-resources to automatically close the connection and statement
-        try (Connection connection = dataSource.getConnection();
-             Scanner scanner = new Scanner(System.in)) {
-            // Ask the user for a last name of an actor
-            System.out.print("Enter the last name of an actor: ");
-            String lastName = scanner.nextLine();
+        dataSource.setUsername(username);
+        dataSource.setPassword(password);
 
-            // Execute query to retrieve actors with the provided last name
-            String actorsQuery = "SELECT first_name, last_name FROM actor WHERE last_name = ?";
-            try (PreparedStatement actorsStatement = connection.prepareStatement(actorsQuery)) {
-                actorsStatement.setString(1, lastName);
+        DataManager dataManager = new DataManager(dataSource);
 
-                try (ResultSet actorsResult = actorsStatement.executeQuery()) {
-                    if (actorsResult.next()) {
-                        System.out.println("Your matches are: \n");
-                        do {
-                            String firstName = actorsResult.getString("first_name");
-                            lastName = actorsResult.getString("last_name");
-                            System.out.println(firstName + " " + lastName);
-                        } while (actorsResult.next());
+        Scanner scanner = new Scanner(System.in);
 
-                    } else {
-                        System.out.println("No matches!");
-                    }
-                }
+        System.out.print("Enter the last name of the actor: ");
+        String lastName = scanner.nextLine();
+
+        List<Actor> actors = dataManager.searchActorsByName(lastName);
+
+        if (!actors.isEmpty()) {
+            System.out.println("Your matches are:\n");
+
+            for (Actor actor : actors) {
+                System.out.println("Actor ID: " + actor.getActorId());
+                System.out.println("First Name: " + actor.getFirstName());
+                System.out.println("Last Name: " + actor.getLastName());
+                System.out.println();
             }
+        } else {
+            System.out.println("No matches!");
+        }
 
-            // Ask the user for a first name and last name of an actor
-            System.out.print("\nEnter the first name of an actor: ");
-            String firstName = scanner.nextLine();
-            System.out.print("Enter the last name of an actor: ");
-            lastName = scanner.nextLine();
+        System.out.print("Enter the actor ID to see their films: ");
+        int actorId = scanner.nextInt();
 
-            // Execute query to retrieve films the actor has been in
-            String filmsQuery = "SELECT title FROM film f JOIN film_actor fa ON f.film_id = fa.film_id " +
-                    "JOIN actor a ON fa.actor_id = a.actor_id " +
-                    "WHERE a.first_name = ? AND a.last_name = ?";
-            try (PreparedStatement filmsStatement = connection.prepareStatement(filmsQuery)) {
-                filmsStatement.setString(1, firstName);
-                filmsStatement.setString(2, lastName);
+        List<Film> films = dataManager.getFilmsByActorId(actorId);
 
-                try (ResultSet filmsResult = filmsStatement.executeQuery()) {
-                    if (filmsResult.next()) {
-                        System.out.println("\nThe films the actor has been in: \n");
-                        do {
-                            String filmTitle = filmsResult.getString("title");
-                            System.out.println(filmTitle);
-                        } while (filmsResult.next());
-                    } else {
-                        System.out.println("\nNo films found for the actor!");
-                    }
-                }
+        if (!films.isEmpty()) {
+            System.out.println("Films for actor ID " + actorId + ":\n");
+
+            for (Film film : films) {
+                System.out.println("Film ID: " + film.getFilmId());
+                System.out.println("Title: " + film.getTitle());
+                System.out.println("Description: " + film.getDescription());
+                System.out.println("Release Year: " + film.getReleaseYear());
+                System.out.println("Length: " + film.getLength());
+                System.out.println();
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } else {
+            System.out.println("No films found for actor ID " + actorId);
         }
     }
 }
