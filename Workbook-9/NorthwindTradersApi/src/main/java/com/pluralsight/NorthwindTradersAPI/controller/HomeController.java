@@ -7,14 +7,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class HomeController {
-
-
-    @RequestMapping(path = "/", method = RequestMethod.GET)
-    public String index(@RequestParam(required = false, name = "country", defaultValue = "World") String country) {
-        if (country == null || country.isEmpty()) {
-            return "Hello World!";
-        } else {
-            return "Hello " + country ;
-        }
+    @RequestMapping(path="/", method=RequestMethod.GET)
+    public String index(@RequestParam(defaultValue="World") String country) {
+        return "Hello " + country + "!";
     }
-}
+    }
