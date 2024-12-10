@@ -1,11 +1,13 @@
-package com.pluralsight.NorthwindTradersAPI2.controllers;
+package com.pluralsight.NorthwindTradersAPI3.controllers;
 
-import com.pluralsight.NorthwindTradersAPI2.models.Product;
-import org.springframework.web.bind.annotation.*;
+import com.pluralsight.NorthwindTradersAPI3.models.Product;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 public class ProductsController {
@@ -24,7 +26,6 @@ public class ProductsController {
     public List<Product> getAllProducts() {
         return products;
     }
-
 
 
     @RequestMapping(path = "/products/{productId}", method = RequestMethod.GET)
