@@ -1,10 +1,16 @@
-package com.pluralsight.NorthwindTradersAPI2.models;
+package com.pluralsight.NorthwindTradersSpringBoot4.models;
 
 public class Product {
     private int productId;
     private String productName;
     private int categoryId;
     private double unitPrice;
+
+    public Product(String productName, int categoryId, double unitPrice) {
+        this.productName = productName;
+        this.categoryId = categoryId;
+        this.unitPrice = unitPrice;
+    }
 
     public Product(int productId, String productName, int categoryId, double unitPrice) {
         this.productId = productId;
@@ -43,5 +49,15 @@ public class Product {
 
     public void setUnitPrice(double unitPrice) {
         this.unitPrice = unitPrice;
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "productId=" + productId +
+                ", productName='" + productName + '\'' +
+                ", categoryId=" + categoryId +
+                ", unitPrice=" + unitPrice +
+                '}';
     }
 }

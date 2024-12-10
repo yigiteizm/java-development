@@ -1,9 +1,14 @@
 package com.pluralsight.NorthwindTradersAPI2.models;
 
-public class Category {private int categoryId;
+public class Category {
+    private int categoryId;
     private String categoryName;
 
-    // Getters ve Setters
+    public Category(int categoryId, String categoryName) {
+        this.categoryId = categoryId;
+        this.categoryName = categoryName;
+    }
+
     public int getCategoryId() {
         return categoryId;
     }
