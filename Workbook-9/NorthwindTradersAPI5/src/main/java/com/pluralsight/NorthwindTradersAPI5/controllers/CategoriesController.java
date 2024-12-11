@@ -1,6 +1,4 @@
 package com.pluralsight.NorthwindTradersAPI5.controllers;
-
-
 import com.pluralsight.NorthwindTradersAPI5.dao.interfaces.ICategoryDao;
 import com.pluralsight.NorthwindTradersAPI5.models.Category;
 import org.springframework.beans.factory.annotation.Autowired;
